@@ -1,0 +1,51 @@
+/**
+ * Global Stylesheet
+ * 
+ * This file contains global styles for the Audio Atlas application.
+ * It uses Tailwind CSS for utility classes and defines custom styles
+ * for accessibility features, particularly focus indicators.
+ * 
+ * The accessibility-first design philosophy is embodied here through:
+ * - High-contrast color scheme (dark theme)
+ * - Prominent focus indicators for keyboard navigation
+ * - Clear visual hierarchy
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /**
+   * Global accessible focus ring style
+   * 
+   * This is a critical accessibility feature for keyboard-only users like
+   * Anjali, the primary persona. All interactive elements receive a bright,
+   * high-contrast focus indicator when navigated to via keyboard.
+   * 
+   * The :focus-visible pseudo-class ensures the focus ring only appears
+   * during keyboard navigation, not mouse clicks.
+   */
+  :focus-visible {
+    outline: 3px solid #60a5fa; /* Bright blue for high contrast */
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /**
+   * Base body styles
+   */
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
+      Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /**
+   * Ensure smooth scrolling for better UX
+   */
+  html {
+    scroll-behavior: smooth;
+  }
+}
