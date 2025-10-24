@@ -332,7 +332,7 @@
   .findings-panel,
   .report-panel {
     background: #fff;
-    border: 1px solid #e7e2de;
+    border: 2px solid var(--chip);
     border-radius: 12px;
     padding: 1.25rem;
   }
@@ -383,10 +383,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #a67c6a;
-    color: #fff;
+    background: #FFC47E;
+    color: #111;
     border-radius: 50%;
-    font: 600 0.75rem 'Space Grotesk', system-ui, sans-serif;
+    font: 800 0.75rem 'Space Grotesk', system-ui, sans-serif;
   }
 
   .finding-text {
@@ -436,12 +436,12 @@
   }
 
   .btn-primary {
-    background: #a67c6a;
-    color: #fff;
+    background: #FFC47E;
+    color: #111;
   }
 
   .btn-primary:hover:not(:disabled) {
-    background: #956b5a;
+    background: #E6AF6F;
     transform: translateY(-1px);
   }
 
@@ -458,7 +458,7 @@
 
   .btn-secondary:hover {
     background: #f9fafb;
-    border-color: #a67c6a;
+    border-color: #FFC47E;
   }
 
   .footer {
@@ -484,7 +484,7 @@
     width: 48px;
     height: 48px;
     border: 4px solid #e7e2de;
-    border-top-color: #a67c6a;
+    border-top-color: #FFC47E;
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-bottom: 1rem;

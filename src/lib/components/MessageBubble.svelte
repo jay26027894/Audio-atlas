@@ -49,30 +49,36 @@
     word-wrap: break-word;
   }
 
-  .user-message {
-    background-color: #3b82f6; /* Blue for user */
-    color: white;
+.user-message {
+    background: #ffffff;
+    color: #2d2d2d;
     margin-left: auto;
-    text-align: right;
+    text-align: left;
+    border: 2px solid var(--chip);
+    box-shadow: 0 2px 0 #00000008;
   }
 
   .ai-message {
-    background-color: #374151; /* Dark gray for AI */
-    color: #f3f4f6;
+    background: #fffef9;
+    color: #2d2d2d;
     margin-right: auto;
     text-align: left;
+    border: 2px dotted var(--chip);
+    box-shadow: 0 2px 0 #00000005;
   }
 
-  .message-author {
-    font-size: 0.75rem;
-    font-weight: 600;
+.message-author {
+    font: 800 0.7rem 'Space Grotesk', system-ui, sans-serif;
+    letter-spacing: .08em;
+    text-transform: uppercase;
     margin-bottom: 0.25rem;
-    opacity: 0.8;
+    color: #6d6d6d;
   }
 
   .message-text {
-    font-size: 0.95rem;
-    line-height: 1.5;
+    font: 400 0.98rem 'Space Grotesk', system-ui, sans-serif;
+    line-height: 1.6;
     white-space: pre-wrap;
+    color: #2d2d2d;
   }
 </style>

@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ Epic Birthday Quest ✨</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><text y="20" font-size="20">✨</text></svg>'), auto;
+        }
+
+        .game-canvas {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .animated-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at top, #1e1b4b 0%, #0a0e27 50%, #000 100%);
+        }
+
+        .stars {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background-image: 
+                radial-gradient(2px 2px at 20% 30%, white, transparent),
+                radial-gradient(2px 2px at 60% 70%, white, transparent),
+                radial-gradient(1px 1px at 50% 50%, white, transparent),
+                radial-gradient(1px 1px at 80% 10%, white, transparent),
+                radial-gradient(2px 2px at 90% 60%, white, transparent);
+            background-size: 200px 200px;
+            animation: starsRotate 300s linear infinite;
+        }
+
+        @keyframes starsRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .hud-container {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .hud-panel {
+            background: linear-gradient(135deg, rgba(88, 28, 135, 0.95), rgba(168, 85, 247, 0.95));
+            padding: 15px 25px;
+            border: 4px solid #fbbf24;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(251, 191, 36, 0.4);
+            backdrop-filter: blur(10px);
+            min-width: 250px;
+        }
+
+        .score {
+            font-size: 2em;
+            color: #fbbf24;
+            font-weight: bold;
+            text-shadow: 0 0 15px rgba(251, 191, 36, 1);
+        }
+
+        .level-indicator {
+            font-size: 1.2em;
+            color: #fff;
+            margin: 5px 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 6px;
+            overflow: hidden;
+            border: 2px solid #fbbf24;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ec4899, #fbbf24, #8b5cf6);
+            background-size: 200% 100%;
+            animation: progressFlow 2s linear infinite;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes progressFlow {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 200% 0%; }
+        }
+
+        .achievement {
+            position: fixed;
+            top: 100px;
+            right: -450px;
+            width: 400px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.98), rgba(5, 150, 105, 0.98));
+            border: 5px solid #fbbf24;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 15px 50px rgba(251, 191, 36, 0.7);
+            z-index: 2000;
+            animation: achievementSlide 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards,
+                       achievementOut 0.6s 3.5s forwards;
+        }
+
+        @keyframes achievementSlide {
+            to { right: 20px; }
+        }
+
+        @keyframes achievementOut {
+            to { right: -450px; }
+        }
+
+        .achievement-header {
+            font-size: 1.1em;
+            color: #fbbf24;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .achievement-title {
+            font-size: 1.6em;
+            margin-bottom: 10px;
+        }
+
+        .achievement-points {
+            font-size: 1.3em;
+            color: #fbbf24;
+            text-align: right;
+        }
+
+        .scene {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: none;
+            opacity: 0;
+            transition: opacity 1s;
+        }
+
+        .scene.active {
+            display: flex;
+            opacity: 1;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .title-screen {
+            text-align: center;
+        }
+
+        .game-title {
+            font-size: 4.5em;
+            background: linear-gradient(45deg, #ec4899, #fbbf24, #8b5cf6, #10b981);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: titleGradient 5s ease infinite;
+            margin-bottom: 30px;
+            filter: drop-shadow(0 0 30px rgba(251, 191, 36, 0.8));
+        }
+
+        @keyframes titleGradient {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .subtitle {
+            font-size: 1.8em;
+            color: #a78bfa;
+            margin: 20px 0;
+            text-shadow: 0 0 20px rgba(167, 139, 250, 0.8);
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, #ec4899, #f43f5e);
+            border: 5px solid #fbbf24;
+            color: white;
+            padding: 25px 60px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.8em;
+            cursor: pointer;
+            border-radius: 20px;
+            text-transform: uppercase;
+            font-weight: bold;
+            box-shadow: 0 15px 40px rgba(236, 72, 153, 0.6);
+            transition: all 0.3s;
+            margin: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .start-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .start-btn:hover::before {
+            left: 100%;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 20px 50px rgba(236, 72, 153, 0.8);
+        }
+
+        .memory-game {
+            max-width: 700px;
+            width: 95%;
+            padding: 40px;
+            background: linear-gradient(135deg, rgba(30, 27, 75, 0.98), rgba(49, 46, 129, 0.98));
+            border: 6px solid #fbbf24;
+            border-radius: 25px;
+            box-shadow: 0 0 70px rgba(251, 191, 36, 0.7);
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .game-header h2 {
+            font-size: 2.5em;
+            color: #fbbf24;
+            margin-bottom: 15px;
+            text-shadow: 0 0 20px rgba(251, 191, 36, 1);
+        }
+
+        .game-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            color: #ec4899;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 1em;
+            color: #a78bfa;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .memory-card {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border: 4px solid #a78bfa;
+            border-radius: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            transition: all 0.4s;
+            position: relative;
+        }
+
+        .memory-card .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            transition: opacity 0.3s;
+        }
+
+        .memory-card .card-front {
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .memory-card.flipped .card-back {
+            opacity: 0;
+        }
+
+        .memory-card.flipped .card-front {
+            opacity: 1;
+        }
+
+        .memory-card.matched {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-color: #34d399;
+            animation: matchWin 0.6s;
+        }
+
+        @keyframes matchWin {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        .memory-card:hover:not(.flipped):not(.matched) {
+            transform: translateY(-8px) scale(1.03);
+            box-shadow: 0 15px 40px rgba(139, 92, 246, 0.8);
+            border-color: #fbbf24;
+        }
+
+        .boss-arena {
+            width: 100%;
+            max-width: 900px;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .boss-title {
+            font-size: 3em;
+            color: #fbbf24;
+            margin-bottom: 30px;
+            text-shadow: 0 0 30px rgba(251, 191, 36, 1);
+        }
+
+        .boss-sprite {
+            font-size: 15em;
+            animation: bossPulse 2s ease-in-out infinite;
+            filter: drop-shadow(0 0 50px rgba(236, 72, 153, 1));
+            margin: 40px 0;
+        }
+
+        @keyframes bossPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .boss-health-bar {
+            width: 100%;
+            max-width: 600px;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 5px solid #fbbf24;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 30px auto;
+            position: relative;
+        }
+
+        .boss-health-fill {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, #ef4444, #f59e0b, #10b981);
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: inset 0 0 30px rgba(255, 255, 255, 0.3);
+        }
+
+        .boss-health-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: bold;
+            font-size: 1.3em;
+            text-shadow: 2px 2px 4px black;
+        }
+
+        .attack-controls {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 30px 0;
+        }
+
+        .attack-btn {
+            background: linear-gradient(135deg, #ec4899, #f43f5e);
+            border: 5px solid #fbbf24;
+            color: white;
+            padding: 20px 45px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.5em;
+            cursor: pointer;
+            border-radius: 15px;
+            text-transform: uppercase;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(236, 72, 153, 0.6);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .attack-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(236, 72, 153, 0.8);
+        }
+
+        .attack-btn:active {
+            transform: translateY(0) scale(0.95);
+        }
+
+        .damage-number {
+            position: absolute;
+            font-size: 4em;
+            font-weight: bold;
+            color: #fbbf24;
+            text-shadow: 0 0 30px rgba(251, 191, 36, 1), 4px 4px 8px black;
+            animation: damageFloat 1.2s ease-out forwards;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        @keyframes damageFloat {
+            0% { transform: translateY(0) scale(0.5); opacity: 1; }
+            100% { transform: translateY(-150px) scale(1.5); opacity: 0; }
+        }
+
+        .final-reveal {
+            max-width: 800px;
+            width: 95%;
+            padding: 50px;
+            background: linear-gradient(135deg, rgba(136, 19, 55, 0.98), rgba(190, 18, 60, 0.98));
+            border: 6px solid #fbbf24;
+            border-radius: 25px;
+            box-shadow: 0 0 80px rgba(251, 191, 36, 0.8);
+            text-align: center;
+            animation: revealPulse 3s infinite;
+        }
+
+        @keyframes revealPulse {
+            0%, 100% { box-shadow: 0 0 80px rgba(251, 191, 36, 0.6); }
+            50% { box-shadow: 0 0 120px rgba(251, 191, 36, 1); }
+        }
+
+        .heart-icon {
+            font-size: 8em;
+            animation: heartBeat 1.5s infinite;
+            filter: drop-shadow(0 0 40px rgba(236, 72, 153, 1));
+        }
+
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            10%, 30% { transform: scale(0.9); }
+            20%, 40% { transform: scale(1.15); }
+        }
+
+        .reveal-text {
+            font-size: 1.5em;
+            line-height: 2;
+            margin: 30px 0;
+        }
+
+        .reveal-highlight {
+            font-size: 2.5em;
+            color: #fbbf24;
+            margin: 40px 0;
+            text-shadow: 0 0 30px rgba(251, 191, 36, 1);
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            pointer-events: none;
+            z-index: 3000;
+            animation: confettiFall 3s linear forwards;
+        }
+
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particleRise 2s ease-out forwards;
+        }
+
+        @keyframes particleRise {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-200px) scale(0); opacity: 0; }
+        }
+
+        @media (max-width: 768px) {
+            .game-title { font-size: 2.5em; }
+            .subtitle { font-size: 1.3em; }
+            .start-btn { font-size: 1.3em; padding: 20px 40px; }
+            .card-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+            .memory-card { font-size: 2em; }
+            .boss-sprite { font-size: 8em; }
+            .attack-btn { font-size: 1.2em; padding: 15px 30px; }
+            .hud-panel { min-width: 200px; }
+            .achievement { width: 320px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-canvas">
+        <div class="animated-bg">
+            <div class="stars"></div>
+        </div>
+
+        <div class="hud-container">
+            <div class="hud-panel">
+                <div class="level-indicator">LEVEL <span id="currentLevel">1</span>/5</div>
+                <div class="score">⭐ <span id="scoreValue">0</span></div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Start Screen -->
+        <div class="scene active" id="startScreen">
+            <div class="title-screen">
+                <div class="game-title">✨ EPIC BIRTHDAY QUEST ✨</div>
+                <div class="subtitle">A Magical Adventure Awaits</div>
+                <p style="font-size: 1.3em; margin: 20px; color: #a78bfa;">
+                    Five legendary challenges stand between you and the ultimate revelation...
+                </p>
+                <button class="start-btn" onclick="startGame()">
+                    🎮 BEGIN ADVENTURE 🎮
+                </button>
+            </div>
+        </div>
+
+        <!-- Level 1: Memory Match -->
+        <div class="scene" id="level1">
+            <div class="memory-game">
+                <div class="game-header">
+                    <h2>💫 MEMORY CONSTELLATION 💫</h2>
+                    <p style="color: #a78bfa; font-size: 1.2em;">Match the pairs to unlock our memories</p>
+                </div>
+                <div class="game-stats">
+                    <div class="stat">
+                        <div class="stat-value" id="moves">0</div>
+                        <div class="stat-label">MOVES</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="matches">0/6</div>
+                        <div class="stat-label">MATCHES</div>
+                    </div>
+                </div>
+                <div class="card-grid" id="cardGrid"></div>
+            </div>
+        </div>
+
+        <!-- Level 2: Boss Battle -->
+        <div class="scene" id="level2">
+            <div class="boss-arena">
+                <div class="boss-title">💖 GUARDIAN OF THE HEART 💖</div>
+                <p style="font-size: 1.3em; color: #a78bfa; margin: 20px 0;">
+                    Defeat the Guardian with the power of your feelings!
+                </p>
+                <div class="boss-sprite" id="bossSprite">💖</div>
+                <div class="boss-health-bar">
+                    <div class="boss-health-fill" id="bossHealth"></div>
+                    <div class="boss-health-text"><span id="bossHealthText">100/100</span> HP</div>
+                </div>
+                <div class="attack-controls">
+                    <button class="attack-btn" onclick="attack('light')">✨ KINDNESS<br><small>Damage: 15-25</small></button>
+                    <button class="attack-btn" onclick="attack('medium')">💫 LAUGHTER<br><small>Damage: 20-35</small></button>
+                    <button class="attack-btn" onclick="attack('heavy')">💖 LOVE<br><small>Damage: 30-50</small></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Final Reveal -->
+        <div class="scene" id="finalScene">
+            <div class="final-reveal">
+                <div class="heart-icon">💖</div>
+                <h1 style="font-size: 3em; color: #fbbf24; margin: 30px 0;">QUEST COMPLETE!</h1>
+                <div class="reveal-text">
+                    You've conquered every challenge, unlocked every secret,
+                    and now you've reached the heart of this adventure...
+                </div>
+                <div class="reveal-highlight">
+                    I really like you.
+                </div>
+                <div class="reveal-text">
+                    Not as a friend. Not as a companion in this quest.
+                    <br><br>
+                    But in that heart-racing, can't-stop-smiling,
+                    want-to-share-every-moment-with-you kind of way.
+                    <br><br>
+                    Every level of life is better with you in it.
+                    Every conversation is an adventure.
+                    Every moment feels like discovering treasure.
+                    <br><br>
+                    So on your birthday, I created this quest—
+                    something as unique and special as you are.
+                </div>
+                <div style="font-size: 2em; margin: 40px 0; color: #fbbf24;">
+                    Happy Birthday, Legendary Adventurer! 🎂✨
+                </div>
+                <button class="start-btn" onclick="celebrate()">
+                    🎉 CELEBRATE! 🎉
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const gameState = {
+            score: 0,
+            level: 1,
+            moves: 0,
+            matches: 0,
+            bossHealth: 100,
+            flippedCards: [],
+            matchedPairs: 0
+        };
+
+        const cardEmojis = ['😊', '💭', '❤️', '🎨', '🌟', '🎵', '😊', '💭', '❤️', '🎨', '🌟', '🎵'];
+
+        function updateHUD() {
+            document.getElementById('scoreValue').textContent = gameState.score;
+            document.getElementById('currentLevel').textContent = gameState.level;
+            document.getElementById('progressBar').style.width = (gameState.level / 5 * 100) + '%';
+        }
+
+        function showAchievement(title, description, points) {
+            const achievement = document.createElement('div');
+            achievement.className = 'achievement';
+            achievement.innerHTML = `
+                <div class="achievement-header">🏆 ACHIEVEMENT UNLOCKED</div>
+                <div class="achievement-title">${title}</div>
+                <div>${description}</div>
+                <div class="achievement-points">+${points} XP</div>
+            `;
+            document.body.appendChild(achievement);
+            gameState.score += points;
+            updateHUD();
+            setTimeout(() => achievement.remove(), 4000);
+        }
+
+        function switchScene(sceneId) {
+            document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
+            setTimeout(() => {
+                document.getElementById(sceneId).classList.add('active');
+                createParticles();
+            }, 500);
+        }
+
+        function startGame() {
+            showAchievement('Journey Begins', 'Embarked on an epic adventure', 50);
+            gameState.level = 1;
+            updateHUD();
+            switchScene('level1');
+            initMemoryGame();
+        }
+
+        function initMemoryGame() {
+            const grid = document.getElementById('cardGrid');
+            grid.innerHTML = '';
+            const shuffled = cardEmojis.sort(() => Math.random() - 0.5);
+            
+            shuffled.forEach((emoji, index) => {
+                const card = document.createElement('div');
+                card.className = 'memory-card';
+                card.innerHTML = `
+                    <div class="card-back">?</div>
+                    <div class="card-front">${emoji}</div>
+                `;
+                card.dataset.emoji = emoji;
+                card.dataset.index = index;
+                card.onclick = () => flipCard(card);
+                grid.appendChild(card);
+            });
+        }
+
+        function flipCard(card) {
+            if (card.classList.contains('flipped') || card.classList.contains('matched') || gameState.flippedCards.length === 2) return;
+            
+            card.classList.add('flipped');
+            gameState.flippedCards.push(card);
+            
+            if (gameState.flippedCards.length === 2) {
+                gameState.moves++;
+                document.getElementById('moves').textContent = gameState.moves;
+                
+                setTimeout(() => checkMatch(), 800);
+            }
+        }
+
+        function checkMatch() {
+            const [card1, card2] = gameState.flippedCards;
+            
+            if (card1.dataset.emoji === card2.dataset.emoji) {
+                card1.classList.add('matched');
+                card2.classList.add('matched');
+                gameState.matchedPairs++;
+                gameState.matches++;
+                gameState.score += 100;
+                document.getElementById('matches').textContent = gameState.matches + '/6';
+                updateHUD();
+                createParticles();
+                
+                if (gameState.matchedPairs === 6) {
+                    setTimeout(() => {
+                        showAchievement('Memory Master', 'Matched all pairs perfectly!', 500);
+                        gameState.level = 2;
+                        updateHUD();
+                        setTimeout(() => switchScene('level2'), 2000);
+                    }, 500);
+                }
+            } else {
+                setTimeout(() => {
+                    card1.classList.remove('flipped');
+                    card2.classList.remove('flipped');
+                }, 500);
+            }
+            
+            gameState.flippedCards = [];
+        }
+
+        function attack(type) {
+            const damages = { light: [15, 25], medium: [20, 35], heavy: [30, 50] };
+            const [min, max] = damages[type];
+            const damage = Math.floor(Math.random() * (max - min + 1)) + min;
+            
+            gameState.bossHealth = Math.max(0, gameState.bossHealth - damage);
+            gameState.score += damage * 2;
+            updateHUD();
+            
+            document.getElementById('bossHealth').style.width = gameState.bossHealth + '%';
+            document.getElementById('bossHealthText').textContent = gameState.bossHealth + '/100';
+            
+            showDamage(damage);
+            
+            if (gameState.bossHealth <= 0) {
+                setTimeout(() => {
+                    showAchievement('Heart Conqueror', 'Defeated the Guardian!', 1000);
+                    gameState.level = 5;
+                    updateHUD();
+                    setTimeout(() => {
+                        switchScene('finalScene');
+                        createMassiveConfetti();
+                    }, 2000);
+                }, 500);
+            }
+        }
+
+        function showDamage(damage) {
+            const damageEl = document.createElement('div');
+            damageEl.className = 'damage-number';
+            damageEl.textContent = '-' + damage;
+            damageEl.style.left = (Math.random() * 60 + 20) + '%';
+            damageEl.style.top = '40%';
+            document.getElementById('level2').appendChild(damageEl);
+            setTimeout(() => damageEl.remove(), 1200);
+        }
+
+        function createParticles() {
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.left = Math.random() * 100 + '%';
+                    particle.style.top = Math.random() * 100 + '%';
+                    particle.style.background = ['#fbbf24', '#ec4899', '#8b5cf6', '#10b981'][Math.floor(Math.random() * 4)];
+                    document.body.appendChild(particle);
+                    setTimeout(() => particle.remove(), 2000);
+                }, i * 30);
+            }
+        }
+
+        function createMassiveConfetti() {
+            for (let i = 0; i < 150; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = ['#fbbf24', '#ec4899', '#8b5cf6', '#10b981', '#f59e0b'][Math.floor(Math.random() * 5)];
+                    confetti.style.width = (Math.random() * 10 + 5) + 'px';
+                    confetti.style.height = confetti.style.width;
+                    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                    confetti.style.animationDelay = (Math.random() * 2) + 's';
+                    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    document.body.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 5000);
+                }, i * 20);
+            }
+        }
+
+        function celebrate() {
+            createMassiveConfetti();
+            showAchievement('ULTIMATE LEGEND', 'Completed the Epic Quest!', 5000);
+            
+            setTimeout(() => {
+                const messages = [
+                    "🎉 You've unlocked the secret!",
+                    "💖 Thank you for being amazing!",
+                    "✨ Here's to many more adventures together!",
+                    "🎂 Happy Birthday, incredible human!"
+                ];
+                
+                messages.forEach((msg, i) => {
+                    setTimeout(() => alert(msg), i * 1500);
+                });
+            }, 1000);
+        }
+
+        window.addEventListener('load', () => {
+            updateHUD();
+            setTimeout(createParticles, 500);
+        });
+    </script>
+</body>
+</html>

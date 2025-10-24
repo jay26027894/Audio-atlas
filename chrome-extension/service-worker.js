@@ -1,36 +1,50 @@
 /**
  * Audio Atlas Companion - Service Worker
- * 
- * This service worker creates a context menu item that appears when users
- * right-click on images. It enables seamless transfer of image URLs to the
- * Audio Atlas web application for analysis.
+ *
+ * - Creates a context menu on images to analyze with Audio Atlas.
+ * - Uses a configurable base URL stored in chrome.storage.sync (defaults to http://localhost:5173).
  */
 
-// 1. Create the context menu item upon installation.
-chrome.runtime.onInstalled.addListener(() => {
+const DEFAULT_BASE_URL = "https://audio-atlas.vercel.app";
+
+// Ensure a sane default is set on install and create context menu.
+chrome.runtime.onInstalled.addListener(async () => {
+  try {
+    const { baseUrl } = await chrome.storage.sync.get({ baseUrl: DEFAULT_BASE_URL });
+    if (!baseUrl) {
+      await chrome.storage.sync.set({ baseUrl: DEFAULT_BASE_URL });
+    }
+  } catch (e) {
+    // storage might fail if unavailable; continue with defaults
+    console.warn("Audio Atlas Companion: storage not available, using defaults", e);
+  }
+
   chrome.contextMenus.create({
     id: "analyzeWithAudioAtlas",
-    title: "Analyze Image with Audio Atlas",
-    contexts: ["image"] // This ensures the option only appears on images.
+    title: "Analyze image with Audio Atlas",
+    contexts: ["image"]
   });
-  
-  console.log("Audio Atlas Companion: Context menu item created");
+
+  console.log("Audio Atlas Companion: Installed and context menu created");
 });
 
-// 2. Listen for a click on the context menu item.
-chrome.contextMenus.onClicked.addListener((info, tab) => {
-  if (info.menuItemId === "analyzeWithAudioAtlas" && info.srcUrl) {
-    // The base URL of the Audio Atlas web application.
-    // Update this URL to match your deployment or use localhost for development
-    const appUrl = "http://localhost:5173/analysis";
-    
-    // Construct the new URL with the image source as a query parameter.
-    // It's crucial to encode the component to handle special characters.
-    const urlWithImage = `${appUrl}?imageUrl=${encodeURIComponent(info.srcUrl)}`;
-    
-    console.log("Audio Atlas Companion: Opening analysis with image:", info.srcUrl);
-    
-    // Create a new tab and navigate to the constructed URL.
-    chrome.tabs.create({ url: urlWithImage });
+// When the context menu is clicked, open the analysis page with the image URL.
+chrome.contextMenus.onClicked.addListener(async (info) => {
+  if (info.menuItemId !== "analyzeWithAudioAtlas" || !info.srcUrl) return;
+
+  let baseUrl = DEFAULT_BASE_URL;
+  try {
+    const stored = await chrome.storage.sync.get({ baseUrl: DEFAULT_BASE_URL });
+    baseUrl = stored.baseUrl || DEFAULT_BASE_URL;
+  } catch (e) {
+    console.warn("Audio Atlas Companion: could not read baseUrl, using default", e);
   }
+
+  // Normalize base URL and build analysis URL
+  const normalizedBase = baseUrl.replace(/\/$/, "");
+  const appUrl = `${normalizedBase}/analysis`;
+  const urlWithImage = `${appUrl}?imageUrl=${encodeURIComponent(info.srcUrl)}`;
+
+  console.log("Audio Atlas Companion: Opening analysis with image:", info.srcUrl);
+  chrome.tabs.create({ url: urlWithImage });
 });

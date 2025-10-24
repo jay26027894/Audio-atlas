@@ -263,26 +263,27 @@
     max-width: 500px;
   }
 
-  .drop-zone {
-    border: 2px dashed #ddd;
-    border-radius: 0.75rem;
+.drop-zone {
+    border: 2px dashed var(--chip);
+    border-radius: 16px;
     padding: 3rem 2rem;
     text-align: center;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     cursor: pointer;
-    background: #fafafa;
+    background: #ffffff;
+    box-shadow: 0 2px 0 #00000008;
   }
 
   .drop-zone:hover,
   .drop-zone:focus {
-    border-color: #a67c6a;
-    background: #f5f5f5;
+    border-color: var(--line);
+    background: #fffef9;
   }
 
   .drop-zone.dragging {
-    border-color: #a67c6a;
-    background: #f0f0f0;
-    transform: scale(1.01);
+    border-color: var(--line);
+    background: #fffef2;
+    transform: translateY(-1px);
   }
 
   .upload-content {
@@ -292,9 +293,9 @@
     gap: 1rem;
   }
 
-  .upload-icon {
+.upload-icon {
     font-size: 3rem;
-    color: #a67c6a;
+    color: #111;
     margin-bottom: 0.5rem;
   }
 
@@ -314,23 +315,24 @@
     line-height: 1.5;
   }
 
-  .upload-button {
-    background: #a67c6a;
-    color: white;
-    border: none;
-    padding: 0.875rem 2rem;
-    border-radius: 0.5rem;
+.upload-button {
+    background: #FFC47E;
+    color: #111;
+    border: 2px solid #FFC47E;
+    padding: 0.8rem 1.4rem;
+    border-radius: 12px;
     font-family: 'Space Grotesk', sans-serif;
-    font-weight: 500;
+    font-weight: 800;
     font-size: 0.95rem;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: transform 0.15s ease;
     margin-top: 0.5rem;
+    letter-spacing: .04em;
   }
 
   .upload-button:hover {
-    background: #956b5a;
-    transform: translateY(-2px);
+    background: #E6AF6F;
+    transform: translateY(-1px);
   }
 
   .upload-button.disabled {
@@ -349,15 +351,15 @@
     margin-top: 1rem;
   }
 
-  .format-item {
+.format-item {
     padding: 0.25rem 0.5rem;
-    background: rgba(166, 124, 106, 0.1);
-    border: 1px solid rgba(166, 124, 106, 0.2);
-    border-radius: 0.25rem;
+    background: #fffef9;
+    border: 2px dotted var(--chip);
+    border-radius: 999px;
     font-size: 0.75rem;
-    color: #a67c6a;
+    color: #2d2d2d;
     font-family: 'JetBrains Mono', monospace;
-    font-weight: 500;
+    font-weight: 700;
   }
 
   /* Screen reader only class */

@@ -103,15 +103,16 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    background-color: #111827;
-    border-radius: 0.5rem;
-    border: 1px solid #374151;
+    background: #ffffff;
+    border-radius: 16px;
+    border: 2px solid var(--chip);
+    box-shadow: 0 2px 0 #00000010;
   }
 
   .chat-container {
     flex: 1;
     overflow-y: auto;
-    padding: 1.5rem;
+    padding: 1.25rem;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
@@ -123,17 +124,17 @@
   }
 
   .chat-container::-webkit-scrollbar-track {
-    background: #1f2937;
+    background: #fffef9;
     border-radius: 4px;
   }
 
   .chat-container::-webkit-scrollbar-thumb {
-    background: #4b5563;
+    background: #e6dece;
     border-radius: 4px;
   }
 
   .chat-container::-webkit-scrollbar-thumb:hover {
-    background: #6b7280;
+    background: #d7cdb8;
   }
 
   .empty-state {
@@ -152,24 +153,26 @@
   }
 
   .empty-state-text {
-    font-size: 1.125rem;
-    color: #9ca3af;
-    margin-bottom: 2rem;
+    font-size: 1.05rem;
+    color: #6b6b6b;
+    margin-bottom: 1.25rem;
   }
 
   .example-queries {
-    background-color: #1f2937;
-    padding: 1.5rem;
-    border-radius: 0.5rem;
-    border: 1px solid #374151;
-    max-width: 500px;
+    background: #fffef9;
+    padding: 1rem;
+    border-radius: 12px;
+    border: 2px dotted var(--chip);
+    max-width: 520px;
+    box-shadow: 0 2px 0 #00000008;
   }
 
   .example-title {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #d1d5db;
-    margin-bottom: 0.75rem;
+    font: 800 0.85rem 'Space Grotesk', system-ui, sans-serif;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: #2d2d2d;
+    margin: 0 0 0.5rem 0;
   }
 
   .example-list {
@@ -180,20 +183,18 @@
   }
 
   .example-list li {
-    padding: 0.5rem 0;
-    color: #9ca3af;
-    font-size: 0.875rem;
-    border-bottom: 1px solid #374151;
+    padding: 0.45rem 0;
+    color: #3a3a3a;
+    font-size: 0.95rem;
+    border-bottom: 1px dotted var(--chip);
   }
 
-  .example-list li:last-child {
-    border-bottom: none;
-  }
+  .example-list li:last-child { border-bottom: none; }
 
   .example-list li::before {
     content: '→ ';
-    color: #60a5fa;
-    font-weight: bold;
+    color: var(--ink);
+    font-weight: 800;
     margin-right: 0.5rem;
   }
 
@@ -206,13 +207,13 @@
   }
 
   .typing-bubble {
-    background-color: #1f2937;
-    border: 1px solid #374151;
-    border-radius: 1rem;
-    padding: 0.75rem 1rem;
+    background: #fffef9;
+    border: 2px dotted var(--chip);
+    border-radius: 12px;
+    padding: 0.6rem 0.85rem;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.6rem;
   }
 
   .typing-dots {
@@ -225,7 +226,7 @@
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background-color: #60a5fa;
+    background-color: var(--ink);
     animation: bounce 1.4s infinite ease-in-out;
   }
 

@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Audio Atlas Settings</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Playfair+Display:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="container">
+      <header class="header">
+        <img src="icon48.png" alt="Audio Atlas" class="logo" />
+        <h1 class="title">Settings</h1>
+      </header>
+
+      <section class="analyze">
+        <label for="baseUrl" class="label">Audio Atlas base URL</label>
+        <input id="baseUrl" type="url" placeholder="http://localhost:5173" />
+        <p class="hint">Example: http://localhost:5173 or https://your-domain.com</p>
+        <div class="actions">
+          <button id="save" class="btn primary">Save</button>
+          <button id="reset" class="btn">Reset to default</button>
+          <button id="open" class="btn">Open</button>
+        </div>
+        <p id="status" class="hint" role="status" aria-live="polite"></p>
+      </section>
+    </main>
+
+    <script src="options.js" defer></script>
+  </body>
+</html>

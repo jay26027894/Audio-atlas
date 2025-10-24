@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Audio Atlas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Playfair+Display:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="container">
+      <header class="header">
+        <img src="icon48.png" alt="Audio Atlas" class="logo" />
+        <h1 class="title">Audio Atlas</h1>
+      </header>
+
+      <section class="status">
+        <div class="row">
+          <span class="label">Base URL</span>
+          <span id="baseUrl" class="value">…</span>
+        </div>
+      </section>
+
+      <section class="actions">
+        <button id="openApp" class="btn primary">Open App</button>
+      </section>
+
+      <section class="analyze">
+        <label for="imageUrl" class="label">Analyze an image URL</label>
+        <div class="input-row">
+          <input id="imageUrl" type="url" placeholder="https://example.com/image.jpg" />
+          <button id="analyzeBtn" class="btn">Analyze</button>
+        </div>
+        <p class="hint">Right-click any image on the web to analyze it via the context menu.</p>
+      </section>
+
+      <footer class="footer">
+        <button id="openSettings" class="link">Settings</button>
+      </footer>
+    </main>
+
+    <script src="popup.js" defer></script>
+  </body>
+</html>

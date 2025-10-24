@@ -154,8 +154,8 @@
 
   .btn { border: 2px solid var(--line); background: #fff; color: #111; border-radius: 12px; padding: .8rem 1.1rem; cursor: pointer; font: 800 1rem 'Space Grotesk', system-ui, sans-serif; letter-spacing:.04em }
   .btn:hover { transform: translateY(-1px); }
-  .btn.primary { background: #111; color: #ffd21f; border-color: #111; }
-  .btn.primary:hover { background: #000; }
+  .btn.primary { background: #FFC47E; color: #111; border-color: #FFC47E; }
+  .btn.primary:hover { background: #E6AF6F; }
   .cta { display:flex; justify-content:center; padding-top:.5rem; }
 
   /* Steps */

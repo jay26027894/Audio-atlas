@@ -1,13 +1,24 @@
 {
   "manifest_version": 3,
   "name": "Audio Atlas Companion",
-  "version": "1.0",
+  "version": "1.2",
   "description": "Send images directly to Audio Atlas for analysis.",
   "permissions": [
     "contextMenus",
-    "tabs"
+    "tabs",
+    "storage"
   ],
   "background": {
     "service_worker": "service-worker.js"
+  },
+  "action": {
+    "default_title": "Audio Atlas",
+    "default_popup": "popup.html"
+  },
+  "options_page": "options.html",
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
   }
 }

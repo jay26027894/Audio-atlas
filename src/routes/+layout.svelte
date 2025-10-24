@@ -18,6 +18,10 @@
   <link rel="icon" href="/req/logo.png" type="image/png" />
   <link rel="apple-touch-icon" href="/req/logo.png" />
   <meta name="theme-color" content="#fffbf1" />
+  <!-- Fonts to match homepage -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Playfair+Display:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
 </svelte:head>
 
 <div class="layout-container">
@@ -34,6 +38,15 @@
 </div>
 
 <style>
+  :root {
+    --ink:#151515; 
+    --cream:#FFF78A; 
+    --yellow:#FFC47E; 
+    --line:#0f0f0f; 
+    --chip:#FFE382;
+    --ring:#60a5fa;
+  }
+
   .layout-container {
     background: #f8f5f2;
     color: #2d2d2d;
