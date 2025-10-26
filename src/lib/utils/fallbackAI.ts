@@ -6,6 +6,7 @@
  */
 
 import { defaultConfig, getAvailableFallbackService, mockResponses } from './aiConfig';
+import { cleanStructuredText } from './textCleaner';
 import type { Message } from '$lib/stores/conversationStore';
 
 /**
@@ -68,7 +69,7 @@ async function getOpenAIResponse(
   const messages: any[] = [
     {
       role: 'system',
-      content: 'You are a helpful AI assistant specialized in analyzing visual data such as charts, diagrams, maps, and graphs. Provide clear, accurate, and accessible descriptions.'
+      content: 'You are a helpful AI assistant specialized in analyzing visual data such as charts, diagrams, maps, and graphs. Provide clear, accurate, and accessible descriptions. Use plain text formatting without asterisks, bold, italic, or other markdown formatting.'
     }
   ];
   
@@ -112,7 +113,8 @@ async function getOpenAIResponse(
   }
   
   const data = await response.json();
-  return data.choices[0]?.message?.content || 'No response from OpenAI';
+  const content = data.choices[0]?.message?.content || 'No response from OpenAI';
+  return cleanStructuredText(content);
 }
 
 /**
@@ -174,7 +176,7 @@ async function getAnthropicResponse(
           ],
         },
       ],
-      system: 'You are a helpful AI assistant specialized in analyzing visual data such as charts, diagrams, maps, and graphs. Provide clear, accurate, and accessible descriptions.',
+      system: 'You are a helpful AI assistant specialized in analyzing visual data such as charts, diagrams, maps, and graphs. Provide clear, accurate, and accessible descriptions. Use plain text formatting without asterisks, bold, italic, or other markdown formatting.',
     }),
   });
   
@@ -183,7 +185,8 @@ async function getAnthropicResponse(
   }
   
   const data = await response.json();
-  return data.content[0]?.text || 'No response from Anthropic';
+  const content = data.content[0]?.text || 'No response from Anthropic';
+  return cleanStructuredText(content);
 }
 
 /**
@@ -206,7 +209,7 @@ async function getCohereResponse(
   // Add system message
   messages.push({
     role: 'system',
-    content: 'You are a helpful AI assistant specialized in analyzing visual data such as charts, diagrams, maps, and graphs. Since you cannot see the image directly, provide helpful analysis based on the context of the user\'s questions about visual content.'
+    content: 'You are a helpful AI assistant specialized in analyzing visual data such as charts, diagrams, maps, and graphs. Since you cannot see the image directly, provide helpful analysis based on the context of the user\'s questions about visual content. Use plain text formatting without asterisks, bold, italic, or other markdown formatting.'
   });
   
   // Add conversation history
@@ -246,7 +249,8 @@ async function getCohereResponse(
   
   const data = await response.json();
   // Cohere v2 API returns content in message.content array
-  return data.message?.content?.[0]?.text || 'No response from Cohere';
+  const content = data.message?.content?.[0]?.text || 'No response from Cohere';
+  return cleanStructuredText(content);
 }
 
 /**
@@ -330,7 +334,8 @@ async function getGoogleGeminiResponse(
   }
   
   const data = await response.json();
-  return data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response from Google Gemini';
+  const content = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response from Google Gemini';
+  return cleanStructuredText(content);
 }
 
 /**

@@ -21,6 +21,7 @@ import type { Message } from '$lib/stores/conversationStore';
 import { getFallbackAIResponse } from './fallbackAI';
 import { getAvailableFallbackService } from './aiConfig';
 import { fileMetadataStore, type FileMetadata } from '$lib/stores/imageStore';
+import { cleanStructuredText } from './textCleaner';
 import { get } from 'svelte/store';
 
 /**
@@ -254,12 +255,12 @@ Sample Rate: ${fileMetadata.audioSampleRate} Hz
   } else {
     // Determine the appropriate system instruction based on query type
     if (isNavigationalQuery(userPrompt)) {
-      systemInstruction = `System: You are an expert at interpreting diagrams, flowcharts, and maps. Your task is to trace the connections and describe the sequence of events or spatial relationships shown in the image in a clear, step-by-step manner. Follow the arrows and connections logically.\n\n`;
+      systemInstruction = `System: You are an expert at interpreting diagrams, flowcharts, and maps. Your task is to trace the connections and describe the sequence of events or spatial relationships shown in the image in a clear, step-by-step manner. Follow the arrows and connections logically. Use plain text formatting without asterisks, bold, or italic markup.\n\n`;
     } else if (isDataExtractionQuery(userPrompt)) {
-      systemInstruction = `System: You are a data extraction expert. When asked for specific data points, values, labels, or trends from a chart or graph, respond with the precise information. If possible, provide structured data in your response.\n\n`;
+      systemInstruction = `System: You are a data extraction expert. When asked for specific data points, values, labels, or trends from a chart or graph, respond with the precise information. If possible, provide structured data in your response. Use plain text formatting without asterisks, bold, or italic markup.\n\n`;
     } else if (isAudioAnalysisQuery(userPrompt)) {
       // User is asking audio-related questions but we might have an image
-      systemInstruction = `System: You are analyzing visual data that may represent audio information (such as a spectrogram or waveform). Provide detailed analysis of frequency patterns, time-based events, and amplitude variations visible in the image.\n\n`;
+      systemInstruction = `System: You are analyzing visual data that may represent audio information (such as a spectrogram or waveform). Provide detailed analysis of frequency patterns, time-based events, and amplitude variations visible in the image. Use plain text formatting without asterisks, bold, or italic markup.\n\n`;
     }
   }
 
@@ -315,10 +316,10 @@ export async function getAiResponse(
       console.log('Using Chrome Built-in AI');
       
       // Adjust system prompt based on file type
-      let systemPrompt = 'You are a helpful AI assistant specialized in analyzing visual data such as charts, diagrams, maps, and graphs. Provide clear, accurate, and accessible descriptions.';
+      let systemPrompt = 'You are a helpful AI assistant specialized in analyzing visual data such as charts, diagrams, maps, and graphs. Provide clear, accurate, and accessible descriptions. Use plain text formatting without asterisks, bold, italic, or other markdown formatting.';
       
       if (fileMetadata && fileMetadata.type === 'audio') {
-        systemPrompt = 'You are a helpful AI assistant specialized in analyzing spectrograms and audio visualizations. You understand frequency analysis, time-domain representations, and acoustic patterns. Provide clear, accurate, and detailed descriptions of audio content based on spectrogram analysis.';
+        systemPrompt = 'You are a helpful AI assistant specialized in analyzing spectrograms and audio visualizations. You understand frequency analysis, time-domain representations, and acoustic patterns. Provide clear, accurate, and detailed descriptions of audio content based on spectrogram analysis. Use plain text formatting without asterisks, bold, italic, or other markdown formatting.';
       }
       
       // Create a language model session
@@ -338,7 +339,8 @@ export async function getAiResponse(
       // Clean up the session
       session.destroy();
 
-      return response;
+      // Clean up any markdown formatting from the response
+      return cleanStructuredText(response);
     }
   } catch (chromeAiError) {
     console.warn('Chrome Built-in AI failed, attempting fallback:', chromeAiError);
