@@ -73,21 +73,48 @@ export const defaultConfig: AIServiceConfig = {
  * Determines which AI service is available for fallback
  */
 export function getAvailableFallbackService(): 'google' | 'openai' | 'anthropic' | 'cohere' | 'mock' | null {
+  console.log('Checking available fallback services...');
+  console.log('Environment variables:', {
+    google: !!defaultConfig.google.apiKey,
+    openai: !!defaultConfig.openai.apiKey,
+    anthropic: !!defaultConfig.anthropic.apiKey,
+    cohere: !!defaultConfig.cohere.apiKey,
+    mock: defaultConfig.mock.enabled,
+    mode: import.meta.env.MODE,
+    dev: import.meta.env.DEV
+  });
+  
   if (defaultConfig.google.apiKey) {
+    console.log('Using Google Gemini as fallback service');
     return 'google';
   }
   if (defaultConfig.openai.apiKey) {
+    console.log('Using OpenAI as fallback service');
     return 'openai';
   }
   if (defaultConfig.anthropic.apiKey) {
+    console.log('Using Anthropic as fallback service');
     return 'anthropic';
   }
   if (defaultConfig.cohere.apiKey) {
+    console.log('Using Cohere as fallback service');
     return 'cohere';
   }
-  if (defaultConfig.mock.enabled) {
+  
+  // In production, if no API keys are available, enable mock responses automatically
+  if (import.meta.env.PROD && !defaultConfig.mock.enabled) {
+    console.log('Production mode detected with no API keys - enabling mock responses as fallback');
+    // Override the mock setting for production
+    defaultConfig.mock.enabled = true;
     return 'mock';
   }
+  
+  if (defaultConfig.mock.enabled) {
+    console.log('Using mock responses as fallback service');
+    return 'mock';
+  }
+  
+  console.warn('No fallback services available');
   return null;
 }
 

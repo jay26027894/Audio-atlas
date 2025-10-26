@@ -7,10 +7,17 @@
 <script lang="ts">
   import '../app.css';
   import APIStatusIndicator from '$lib/components/APIStatusIndicator.svelte';
+  import { debugEnvironmentVariables } from '$lib/utils/envDebug';
+  import { onMount } from 'svelte';
   
   // External props from SvelteKit - marked as used even though they're not directly referenced
   export const params: Record<string, string> = {};
   export const data: unknown = undefined;
+  
+  // Debug environment variables on mount
+  onMount(() => {
+    debugEnvironmentVariables();
+  });
 </script>
 
 <svelte:head>
