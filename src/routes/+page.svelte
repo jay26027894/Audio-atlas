@@ -2,9 +2,10 @@
 
 <script lang="ts">
   import { goto } from '$app/navigation';
-  export let params: Record<string, string>;
-  export let data: unknown;
-  $: void params; $: void data;
+  
+  // External props from SvelteKit - marked as used even though they're not directly referenced
+  export const params: Record<string, string> = {};
+  export const data: unknown = undefined;
 </script>
 
 <svelte:head>
@@ -144,13 +145,6 @@
   #tech .section-title { font-family:'Space Grotesk',system-ui,sans-serif; text-transform:uppercase; letter-spacing:.15em; font-weight:900; font-size:1.4rem }
   #how .step h3 { font-family:'Space Grotesk',system-ui,sans-serif; text-transform:uppercase; letter-spacing:.15em; font-weight:900 }
   #tech .pillar h3 { font-family:'Space Grotesk',system-ui,sans-serif; text-transform:uppercase; letter-spacing:.15em; font-weight:900 }
-  .feature-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:.75rem; padding-left:1rem; }
-  .feature-grid li { background:#fffef9; border:2px dotted var(--chip); border-radius:14px; padding:.7rem .85rem; color:#2e2e2e; font:600 .98rem 'Space Grotesk', system-ui, sans-serif; }
-  .howto { padding-left:1.25rem; color:#3d3d3d; line-height:1.7; }
-  .howto code { background:#fff2b340; padding:.08rem .4rem; border-radius:6px; border:1px solid var(--chip); font-family:'JetBrains Mono', monospace; font-size:.85em; }
-  .hint { margin-top:.6rem; color:#6b6b6b; font-size:.95rem; font-style:italic }
-  .stack { display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:.6rem; padding:0; margin:0; list-style:none; }
-  .stack li { background:#fffef9; border:2px dotted var(--chip); border-radius:12px; padding:.55rem .8rem; color:#2e2e2e; font:600 .95rem 'Space Grotesk', system-ui, sans-serif; }
 
   .btn { border: 2px solid var(--line); background: #fff; color: #111; border-radius: 12px; padding: .8rem 1.1rem; cursor: pointer; font: 800 1rem 'Space Grotesk', system-ui, sans-serif; letter-spacing:.04em }
   .btn:hover { transform: translateY(-1px); }

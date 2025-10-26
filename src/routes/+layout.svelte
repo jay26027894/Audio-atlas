@@ -8,9 +8,9 @@
   import '../app.css';
   import APIStatusIndicator from '$lib/components/APIStatusIndicator.svelte';
   
-  export let params: Record<string, string>;
-  export let data: unknown;
-  $: void params; $: void data;
+  // External props from SvelteKit - marked as used even though they're not directly referenced
+  export const params: Record<string, string> = {};
+  export const data: unknown = undefined;
 </script>
 
 <svelte:head>
@@ -25,7 +25,7 @@
 </svelte:head>
 
 <div class="layout-container">
-  <header class="site-header" role="banner">
+  <header class="site-header">
     <a href="/" class="brand" aria-label="Audio Atlas home">
       <img src="/req/logo.png" alt="Audio Atlas logo" class="brand-mark" width="40" height="40" loading="eager" />
       <span class="brand-text">Audio Atlas</span>
