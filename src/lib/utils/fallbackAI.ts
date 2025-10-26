@@ -267,6 +267,44 @@ async function getGoogleGeminiResponse(
     throw new Error('Google API key not configured');
   }
   
+  // Retry logic with exponential backoff
+  const maxRetries = 3;
+  let lastError: Error | null = null;
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await attemptGeminiRequest(image, prompt, conversationHistory, config);
+    } catch (error) {
+      lastError = error as Error;
+      console.warn(`Google Gemini attempt ${attempt} failed:`, error);
+      
+      // Don't retry on certain errors
+      if (error instanceof Error && (error.message.includes('401') || error.message.includes('403'))) {
+        throw error; // Authentication/authorization errors shouldn't be retried
+      }
+      
+      // Wait before retrying (exponential backoff)
+      if (attempt < maxRetries) {
+        const delay = Math.pow(2, attempt - 1) * 1000; // 1s, 2s, 4s
+        console.log(`Retrying Google Gemini in ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  }
+  
+  throw lastError || new Error('Google Gemini failed after retries');
+}
+
+/**
+ * Actual Gemini API request attempt
+ */
+async function attemptGeminiRequest(
+  image: ArrayBuffer,
+  prompt: string,
+  conversationHistory: Message[],
+  config: any
+): Promise<string> {
+  
   // Convert image to base64
   const base64Image = arrayBufferToBase64(image);
   
@@ -309,19 +347,19 @@ async function getGoogleGeminiResponse(
       safetySettings: [
         {
           category: 'HARM_CATEGORY_HARASSMENT',
-          threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+          threshold: 'BLOCK_ONLY_HIGH'
         },
         {
           category: 'HARM_CATEGORY_HATE_SPEECH',
-          threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+          threshold: 'BLOCK_ONLY_HIGH'
         },
         {
           category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
-          threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+          threshold: 'BLOCK_ONLY_HIGH'
         },
         {
           category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
-          threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+          threshold: 'BLOCK_ONLY_HIGH'
         }
       ]
     }),
@@ -334,7 +372,28 @@ async function getGoogleGeminiResponse(
   }
   
   const data = await response.json();
-  const content = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response from Google Gemini';
+  console.log('Google Gemini API response:', data);
+  
+  // Check if response was blocked by safety filters
+  if (data.candidates?.[0]?.finishReason === 'SAFETY') {
+    console.warn('Google Gemini response blocked by safety filters');
+    return 'I cannot analyze this image due to content safety restrictions. Please try with a different image or query.';
+  }
+  
+  // Check if response was blocked for other reasons
+  if (data.candidates?.[0]?.finishReason && data.candidates[0].finishReason !== 'STOP') {
+    console.warn('Google Gemini response blocked, reason:', data.candidates[0].finishReason);
+    return `Analysis unavailable (reason: ${data.candidates[0].finishReason}). Please try rephrasing your question or using a different image.`;
+  }
+  
+  // Extract the content
+  const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
+  
+  if (!content) {
+    console.warn('Google Gemini returned empty content:', data);
+    return 'I was unable to analyze this image. Please try rephrasing your question or uploading a different image.';
+  }
+  
   return cleanStructuredText(content);
 }
 
@@ -397,9 +456,13 @@ export async function getFallbackAIResponse(
     console.error(`Error with ${availableService} fallback:`, error);
     
     // If the primary fallback fails, try mock responses as last resort
-    if (availableService !== 'mock' && defaultConfig.mock.enabled) {
-      console.log('Primary fallback failed, using mock responses');
-      return await getMockResponse(image, prompt, conversationHistory);
+    if (availableService !== 'mock') {
+      console.log('Primary fallback failed, using mock responses as last resort');
+      try {
+        return await getMockResponse(image, prompt, conversationHistory);
+      } catch (mockError) {
+        console.error('Mock fallback also failed:', mockError);
+      }
     }
     
     throw error;
